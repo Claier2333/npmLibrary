@@ -1,37 +1,50 @@
 import qs from 'qs'
-// sso模块
+import axios from 'axios'
+
 const ssoUrl = {
     dev: 'https://sso-test.ybj.com',
     test: 'https://sso-test.ybj.com',
     prod: 'https://sso-new.ybj.com'
 }
-/**
- * sso登录
- * @param {string} env 环境
- * @param {string} platform 产品编码(平台)
- */
-const useLogIn = (platform, env = 'test') => {
-    const params = {
-        platform,
-        redirectUrl: encodeURIComponent(window.location.href)
+class SSO {
+    constructor(config) {
+        this.platform = '' // 产品编码(平台)
+        this.baseURL = '' // 基础路径
+        this.code = '0001' // 权限状态码
+        this.env = 'dev' // 环境
+        Object.keys(config).forEach((key) => {
+            this[key] = config[key]
+        })
+        this.login()
     }
-    window.location.replace(`${ssoUrl[env]}?${qs.stringify(params)}`)
-}
-/**
- * sso退出
- * @param {string} platform 产品编码(平台)
- * @param {string} env 环境
- */
-const useLogout = (platform, env = 'test') => {
-    const params = {
-        type:'logout',
-        platform,
-        redirectUrl: window.location.origin
+    // 登录
+    login() {
+        axios.defaults.baseURL = this.baseURL
+        axios.interceptors.response.use(
+            (response) => {
+                if (response.data.code === this.code) {
+                    const params = {
+                        platform: this.platform,
+                        redirectUrl: encodeURIComponent(window.location.href)
+                    }
+                    window.location.replace(`${ssoUrl[this.env]}?${qs.stringify(params)}`)
+                }
+                return response
+            },
+            (error) => {
+                return Promise.reject(error)
+            }
+        )
     }
-    window.location.replace(`${ssoUrl[env]}?${qs.stringify(params)}`)
+    // 退出
+    logout() {
+        const params = {
+            type: 'logout',
+            platform: this.platform,
+            redirectUrl: window.location.origin
+        }
+        window.location.replace(`${ssoUrl[this.env]}?${qs.stringify(params)}`)
+    }
 }
 
-export {
-    useLogIn,
-    useLogout
-}
+export { SSO }
