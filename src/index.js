@@ -19,8 +19,10 @@ class SSO {
     }
     // 登录
     login() {
-        axios.defaults.baseURL = this.baseURL
-        axios.interceptors.response.use(
+        const instance = axios.create({
+            baseURL: this.baseURL
+        })
+        instance.interceptors.response.use(
             (response) => {
                 if (response.data.code === this.code) {
                     const params = {
