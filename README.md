@@ -15,9 +15,7 @@ $ yarn add xiajueqiong
 在 main.js 中写入以下内容：
 
 ```js
-import { SSO } from 'xiajueqiong'
-import Vue from 'vue';
-import App from './App.vue';
+import { ssoLogin } from 'xiajueqiong'
 
 /**
  * @param {Object} option
@@ -26,12 +24,24 @@ import App from './App.vue';
  * @param {string} option.code 权限状态码
  * @param {string} option.env 环境
  */
-const option = { platform, baseURL, code, env }
-Vue.prototype.$sso = new SSO(option);
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+const option = { platform, baseURL, code, env }
+const instance = ssoLogin(option)
+
+export const createAPI = (url, method, params, config = {}) => {
+  if (method === 'get') {
+    config.params = params
+  } else {
+    config.data = params
+  }
+  return instance({
+    url,
+    method,
+    ...config
+  })
+}
+
+export default instance
 ```
 
 | 参数名   | 必选 | 说明                                      | 类型   | 可选值        | 默认值 |
@@ -47,10 +57,12 @@ new Vue({
 <div @click="logoutFn">退出</div>
 
 <script>
+  import { ssoLogout } from 'xiajueqiong'
+    
   export default {
     methods: {
         logoutFn() {
-          this.$sso.logout()
+          ssoLogout()
         }
     }
   }
