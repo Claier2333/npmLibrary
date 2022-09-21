@@ -16,7 +16,7 @@ $ yarn add xiajueqiong
 
 ```js
 import Vue from 'vue'
-import { sso } from 'xiajueqiong'
+import sso from 'xiajueqiong'
 
 /**
  * @param {Object} option
@@ -35,7 +35,22 @@ Vue.use(sso, { platform, env })
 ## SSO退出
 
 ```vue
-<div @click="$ssoLogout()">退出</div>
+<template>
+  <div @click="Logout()">退出</div>
+</template>
+
+<script>
+import sso from 'xiajueqiong'
+
+export default {
+    methods: {
+        Logout() {
+            sso.useSSOLogout()
+        }
+    }
+}
+</script>
+
 ```
 
 ## SSO登录拦截
@@ -44,6 +59,7 @@ Vue.use(sso, { platform, env })
 
 ```js
 import axios from 'axios'
+import sso from 'xiajueqiong'
 const instance = axios.create()
 
 /**
@@ -51,7 +67,7 @@ const instance = axios.create()
  * @param {Object} option.axiso 函数对象
  * @param {string} option.code 权限状态码
  */
-ssoLogin({ axiso:instance，code })
+sso.useSSOLogin({ axiso:instance，code })
 ```
 
 | 参数名 | 必选 | 说明           | 类型   | 可选值 | 默认值 |

@@ -9,19 +9,11 @@ const sso = { // 数据初始化
     env: '',
     install (Vue, options = {}) {
         Object.assign(this, options)
-    }
+    },
+    useSSOLogin,
+    useSSOLogout
 }
-
-const useSSOLogout = () => {
-    const params = {
-        type: 'logout',
-        platform: sso.platform,
-        redirectUrl: window.location.origin
-    }
-    window.location.replace(`${ssoUrl[sso.env]}?${qs.stringify(params)}`)
-}
-
-const useSSOLogin = ({ axiso, code, status }) => {
+function useSSOLogin({ axiso, code, status }) {
     axiso.interceptors.response.use(
         response => {
             if (response.data.code === code || response.status === status) {
@@ -39,5 +31,13 @@ const useSSOLogin = ({ axiso, code, status }) => {
     )
     return axiso
 }
+function useSSOLogout() {
+    const params = {
+        type: 'logout',
+        platform: sso.platform,
+        redirectUrl: window.location.origin
+    }
+    window.location.replace(`${ssoUrl[sso.env]}?${qs.stringify(params)}`)
+}
 
-export { sso, useSSOLogin, useSSOLogout }
+export default sso
